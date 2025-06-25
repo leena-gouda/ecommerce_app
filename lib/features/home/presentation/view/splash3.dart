@@ -1,9 +1,9 @@
-import 'package:ecommerce_app/features/home/presentation/view/widgets/HomePage.dart';
-import 'package:ecommerce_app/features/home/presentation/view/widgets/sign_in.dart';
+import 'package:ecommerce_app/features/home/presentation/view/HomePage.dart';
+import 'package:ecommerce_app/features/home/presentation/view/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cubit/splash_cubit.dart';
+import '../cubit/splash_cubit.dart';
 
 class splash3 extends StatelessWidget {
   const splash3({super.key});

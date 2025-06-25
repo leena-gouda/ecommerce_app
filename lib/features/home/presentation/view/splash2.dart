@@ -1,10 +1,10 @@
-import 'package:ecommerce_app/features/home/presentation/view/widgets/HomePage.dart';
-import 'package:ecommerce_app/features/home/presentation/view/widgets/splash1.dart';
-import 'package:ecommerce_app/features/home/presentation/view/widgets/splash3.dart';
+import 'package:ecommerce_app/features/home/presentation/view/HomePage.dart';
+import 'package:ecommerce_app/features/home/presentation/view/splash1.dart';
+import 'package:ecommerce_app/features/home/presentation/view/splash3.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cubit/splash_cubit.dart';
+import '../cubit/splash_cubit.dart';
 
 class splash2 extends StatelessWidget {
   const splash2({super.key});

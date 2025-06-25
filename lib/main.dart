@@ -1,23 +1,30 @@
-import 'package:ecommerce_app/features/home/presentation/view/widgets/HomePage.dart';
 import 'package:flutter/material.dart';
-
-import 'features/home/presentation/view/widgets/splashFlow.dart';
+import 'core/routing/app_router.dart';
+import 'core/routing/routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp(appRouter: AppRouter()));
 }
 
-class MyApp extends StatelessWidget{
-  const MyApp({super.key});
+class MyApp extends StatelessWidget {
+  final AppRouter appRouter;
+
+  const MyApp({super.key, required this.appRouter});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "S",
-        theme: ThemeData(
-            primarySwatch: Colors.purple
+      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.black, fontSize: 20),
         ),
-        debugShowCheckedModeBanner: false,
-        home: SplashFlow()
+      ),
+      initialRoute: Routes.splashScreen,
+      onGenerateRoute: appRouter.generateRoute,
     );
   }
 }
