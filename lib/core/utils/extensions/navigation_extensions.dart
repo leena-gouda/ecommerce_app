@@ -29,6 +29,7 @@ extension NavigationExtensions on BuildContext {
   void popUntil(RoutePredicate predicate) =>
       Navigator.of(this).popUntil(predicate);
 
+
   // Pop the current route and push a new route
   Future<T?> popAndPushNamed<T, TO>(String routeName, {Object? arguments}) =>
       Navigator.of(

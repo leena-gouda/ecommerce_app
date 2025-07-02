@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CustomTextButton extends StatelessWidget {
   final String text;
   final Color? color;
-  final VoidCallback? onPressed;
+  final void Function()? onPressed;
 
   const CustomTextButton({
     super.key,
