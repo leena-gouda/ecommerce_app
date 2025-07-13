@@ -3,7 +3,8 @@ import 'package:ecommerce_app/core/routing/routes.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/authentication/presentation/login/presentation/views/login_screen.dart';
-import '../../features/home/presentation/view/homeepage.dart';
+import '../../features/authentication/presentation/sign_up/presentation/views/sign_up_screen.dart';
+import '../../features/home/presentation/view/home_screen.dart';
 import '../../features/onboarding/presentation/views/onboarding_screen1.dart';
 import '../../features/splash_screen/presentation/views/splash_screen.dart';
 
@@ -16,9 +17,11 @@ class AppRouter {
       case Routes.onboardingScreen:
         return _createRoute(OnboardingScreen());
       case Routes.homeScreen:
-        return _createRoute(Homeepage());
+        return _createRoute(HomeScreen());
       case Routes.loginScreen:
         return _createRoute(LoginScreen());
+      case Routes.signupsScreen:
+        return _createRoute(SignUpScreen());
 
       default:
         return MaterialPageRoute(

@@ -1,98 +1,171 @@
+
 import 'package:ecommerce_app/core/utils/extensions/navigation_extensions.dart';
-import 'package:ecommerce_app/features/authentication/data/models/authentication_model.dart';
-import 'package:ecommerce_app/features/authentication/data/repos/authentication_data.dart';
-import 'package:ecommerce_app/features/authentication/presentation/cubit/authentication_state.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_button.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_textfield1.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_title.dart';
-import 'package:ecommerce_app/features/home/presentation/view/homeepage.dart';
+import 'package:ecommerce_app/features/authentication/presentation/login/presentation/views/widget/login_social_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ecommerce_app/core/theme/app_colors.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../ForgetPassword/presentation/views/Forget_password.dart';
-import '../../../cubit/authentication_cubit.dart';
-import '../../../signn_in/presentation/views/sign_in_screen.dart';
+import '../../../../../../core/routing/routes.dart';
+import '../../../../../../core/theme/app_colors.dart';
+import '../../../../../../core/utils/app_utils.dart';
+import '../../../../../../core/widgets/custom_button.dart';
+import '../../../../../../core/widgets/custom_loading_app.dart';
+import '../../../../../../core/widgets/custom_text_auth.dart';
+import '../../../../../../core/widgets/custom_text_form_field.dart';
+import '../cubit/login_cubit.dart';
 
 class LoginScreen extends StatelessWidget {
-   LoginScreen({super.key});
-  
-
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-    final page = authenticaction_pages[0];
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
-    
     return BlocProvider(
-      create: (context) => AuthCubit(),
+      create: (context) => LoginCubit(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Login'),
-        ),
-        body: Center(
-          child: BlocConsumer<AuthCubit, AuthState>(
-            listener: (context, state) {
-              if (state.error != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.error!)),
-                );
-              }
-              if (state.isLoggedIn) {
-                context.pushReplacement(Homeepage());
-             }
-            },
-            builder: (context, state) {
-                return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        customTitle(text: page.title),
-                        const SizedBox(height: 16),
-                        CustomTextfield(text: page.textfield1, icon1: Icon(Icons.person),controller: _emailController,errorText: state.emailError,),
-                        const SizedBox(height: 16),
-                        CustomTextfield(text: page.textfield2 ?? '', icon1: Icon(Icons.lock),icon2: Icon(CupertinoIcons.eye),obscureText: true, controller: _passwordController,errorText: state.passwordError),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                              onPressed: (){
-                                context.push(forgetPassword());
-                              },
-                              child: Text("Forget Password?",style: TextStyle(color: AppColor.primaryColor,fontSize: 12,fontWeight: FontWeight.w400),),
+        appBar: AppBar(toolbarHeight: 0),
+        body: BlocConsumer<LoginCubit, LoginState>(
+          listener: (context, state) {
+            if (state is LoginLoading) {
+              showLoadingApp(context);
+            }
+            if (state is LoginSuccess) {
+              context.back();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'login_successful',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.green,
+                  // أو أي لون تريده
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  elevation: 6,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+
+              context.pushNamedAndRemoveUntil(Routes.homeScreen);
+            }
+            if (state is LoginError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'Error is ${state.message}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  behavior: SnackBarBehavior.floating,
+                  backgroundColor: Colors.red,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  elevation: 6,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+              context.back();
+            }
+          },
+          builder: (context, state) {
+            final loginCubit = context.read<LoginCubit>();
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Form(
+                  key: loginCubit.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CustomTextAuth(text: "Welcome\nBack!"),
+                      const SizedBox(height: 36),
+                      CustomTextFormField(
+                        hintText: "Username or Email",
+                        controller: loginCubit.emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icon(Icons.person),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your username or email';
+                          }
+                          if (!AppUtils.isEmailValid(value.trim())) {
+                            return 'Enter a valid email address';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 32),
+                      CustomTextFormField(
+                        obscureText: loginCubit.obscureText,
+                        hintText: "Password",
+                        controller: loginCubit.passwordController,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icon(CupertinoIcons.lock_fill),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        },
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            loginCubit.toggleObscureText();
+                          },
+                          icon: Icon(
+                            loginCubit.obscureText == true
+                                ? CupertinoIcons.eye_fill
+                                : CupertinoIcons.eye_slash,
+                            color: Colors.black,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        CustomButton(
-                          text: page.button,
-                          onPressed: state.isLoading ? null : () {
-                            context.read<AuthCubit>().login(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text("Create An Account",style: TextStyle(color: AppColor.textGray,fontSize: 12),),
-                            TextButton(
-                              onPressed: (){
-                                context.push(signin());
-                              },
-                              child: Text("Sign Up",style: TextStyle(color: AppColor.primaryColor,fontSize: 12,fontWeight: FontWeight.w400),),
+                      ),
+                      Align(
+                        alignment: AlignmentDirectional.centerEnd,
+                        child: TextButton(
+                          onPressed: () {},
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            "Forgot Password?",
+                            style: TextStyle(
+                              color: AppColor.primaryColor,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
                             ),
-                          ],
+                          ),
                         ),
-                      ],
-                    ),
-                );
-            },
-          ),
+                      ),
+                      const SizedBox(height: 50),
+                      CustomButton(
+                        text: "Login",
+                        onPressed: () {
+                          loginCubit.login();
+                        },
+                      ),
+                      const SizedBox(height: 70),
+                      LoginSocialRow(),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

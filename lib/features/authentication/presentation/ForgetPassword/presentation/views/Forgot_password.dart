@@ -1,54 +1,68 @@
 import 'package:ecommerce_app/core/theme/app_colors.dart';
 import 'package:ecommerce_app/core/utils/extensions/navigation_extensions.dart';
+import 'package:ecommerce_app/core/widgets/custom_text_form_field.dart';
 import 'package:ecommerce_app/features/authentication/data/repos/authentication_data.dart';
 import 'package:ecommerce_app/features/authentication/presentation/cubit/authentication_cubit.dart';
 import 'package:ecommerce_app/features/authentication/presentation/cubit/authentication_state.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_button.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_textfield1.dart';
-import 'package:ecommerce_app/features/authentication/presentation/widgets/custom_title.dart';
-import 'package:ecommerce_app/features/home/presentation/view/homeepage.dart';
+import 'package:ecommerce_app/features/home/presentation/view/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../../core/routing/routes.dart';
+import '../../../../../../core/widgets/custom_button.dart';
+import '../cubit/forgot_password_cubit.dart';
 
 class forgetPassword extends StatelessWidget {
-  forgetPassword({super.key});
+  const forgetPassword({super.key});
+
   @override
   Widget build(BuildContext context) {
-    final page = authenticaction_pages[2];
-    final _emailController = TextEditingController();
+    // final page = authenticaction_pages[2];
+    // final _emailController = TextEditingController();
 
     return BlocProvider(
-      create: (context) => AuthCubit(),
+      create: (context) => ForgotPasswordCubit(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Login'),
+          title: const Text('Forgot Password?'),
         ),
         body: Center(
-          child: BlocConsumer<AuthCubit, AuthState>(
+          child: BlocConsumer<ForgotPasswordCubit, ForgotPasswordState>(
             listener: (context, state) {
-              if (state.error != null) {
+              if (state is ForgotPasswordSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.error!)),
+                  SnackBar(content: Text("Password reset link sent to your email")),
                 );
+                context.back();
               }
-              if (state.isResetSent) {
+              else if (state is ForgotPasswordError) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Reset email sent!")),
+                  SnackBar(content: Text(state.message ?? 'Error occurred')),
                 );
-                context.back(); // Return to previous screen
+                context.back();
               }
             },
             builder: (context, state) {
+              final forgetPasswordcubit = context.read<ForgotPasswordCubit>();
                 return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        customTitle(text: page.title),
+                        const Text('Enter your email address'),
                         SizedBox(height: 16,),
-                        CustomTextfield(text: page.textfield1, icon1: Icon(Icons.email),controller: _emailController,errorText: state.emailError,),
+                        CustomTextFormField(hintText: "Enter your email address", prefixIcon: Icon(Icons.email),controller: forgetPasswordcubit.emailController,keyboardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your email';
+                              }
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(value)) {
+                                return 'Please enter a valid email';
+                              }
+                              return null;
+                            },
+                        ),
                         SizedBox(height: 16,),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -58,10 +72,8 @@ class forgetPassword extends StatelessWidget {
                           ],
                         ),
                         SizedBox(height: 16,),
-                        CustomButton(text: page.button,onPressed: state.isLoading ? null : () {
-                          context.read<AuthCubit>().sendPasswordResetEmail(
-                            _emailController.text,
-                          );
+                        CustomButton(text: "Submit",onPressed: () {
+                          forgetPasswordcubit.sendPasswordResetEmail();
                         },),
                       ],
                     ),
